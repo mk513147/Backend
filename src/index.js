@@ -13,13 +13,18 @@ dotenv.config({
 
 connectDB()
     .then(() => {
+        app.on("error", (error) => {
+            console.log(`Error while starting the app:${error}`);
+            throw error;
+        })
+
         app.listen(process.env.PORT || 8000, () => {
             console.log(`Server is running on port :${process.env.PORT}`);
         })
     })
-    .catch((err) => {
-        console.log("Database connection failed in main file!!!", err);
-        throw err;
+    .catch((error) => {
+        console.log("Database connection failed in main file!!!", error);
+        throw error;
     });
 
 
@@ -35,9 +40,9 @@ const app = express();
 ; (async () => {
     try {
         await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}}`)
-        app.on("error", (error) => {
-            console.log("Error: ", Error);
-            throw error;
+        app.on("erroror", (erroror) => {
+            console.log("erroror: ", erroror);
+            throw erroror;
         })
 
         app.listen(process.env.PORT, () => {
@@ -45,9 +50,9 @@ const app = express();
 
         })
 
-    } catch (error) {
-        console.log("Error: ", error);
-        throw error;
+    } catch (erroror) {
+        console.log("erroror: ", erroror);
+        throw erroror;
     }
 })()
 */
