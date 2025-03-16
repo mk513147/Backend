@@ -17,4 +17,12 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));// this gets data
 app.use(express.static("public"));// it helps store data/assets in public folder
 app.use(cookieParser());// this helps the server read and manage cookies sent by the browser.
 
+
+// routes import
+import userRouter from './routes/user.routes.js';
+
+// routes declaration
+app.use("/api/v1/users", userRouter)// passing the control to router/ any changes will be done in the router 
+// http://localhost:8000/api/v1/users/register
+
 export { app };
