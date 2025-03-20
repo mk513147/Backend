@@ -3,6 +3,7 @@ import { apiError } from "../utils/apiError.js"
 import { apiResponse } from "../utils/apiResponse.js";
 import { User } from "../models/user.models.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import jwt from "jsonwebtoken";
 
 // function for generating access and refresh token
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -23,6 +24,13 @@ const generateAccessAndRefreshTokens = async (userId) => {
         throw new apiError(500, `Error while genrating tokens!!`)
     }
 
+}
+
+// options for the cookies
+const options = {
+    httpOnly: true, // The cookie cannot be accessed by JavaScript on the client-side, making it more secure.
+    secure: true, // The cookie is only sent over HTTPS, ensuring encrypted transmission.
+    sameSite: "lax", // "None" if frontend and backend are on different origins
 }
 
 
@@ -116,12 +124,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
     // remove password and refreshtoken from the sent data/ can be done another way
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
-    // options for the cookies
-    const options = {
-        httpOnly: true, // The cookie cannot be accessed by JavaScript on the client-side, making it more secure.
-        secure: true, // The cookie is only sent over HTTPS, ensuring encrypted transmission.
-        sameSite: "lax", // "None" if frontend and backend are on different origins
-    }
+
 
     return res.status(200)
         .cookie("accessToken", accessToken, options)
@@ -148,12 +151,6 @@ const logoutUser = asyncHandler(async (req, res) => {
         {
             new: true,// this is necessary to get the updated document
         })
-    // options for the cookies
-    const options = {
-        httpOnly: true, // The cookie cannot be accessed by JavaScript on the client-side, making it more secure.
-        secure: true, // The cookie is only sent over HTTPS, ensuring encrypted transmission.
-        sameSite: "lax", // "None" if frontend and backend are on different origins
-    }
 
     return res.status(200)
         .clearCookie("accessToken", options)
@@ -162,4 +159,38 @@ const logoutUser = asyncHandler(async (req, res) => {
 
 })
 
-export { registerUser, loginUser, logoutUser }
+const refreshAccessToken = asyncHandler(async (req, res) => {
+    // get the refresh token from the cookies or body
+    // check if the refresh token is valid
+    // decode the refresh token
+    // find the user from the decoded refresh token
+    // validate the user
+    // check if the user has the same refresh token in the db
+    // generate new access token
+    // send the tokens in the response
+
+    try {
+        const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
+
+        if (!incomingRefreshToken) throw new apiError(401, `Refresh token is required`);
+
+        const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+        const user = await User.findById(decodedToken?._id);
+
+        if (!user) throw new apiError(404, `User not found`);
+
+        if (incomingRefreshToken !== user.refreshToken) throw new apiError(401, `Invalid refresh token`);
+
+        const { accessToken, newRefreshToken } = await generateAccessAndRefreshTokens(user._id);
+
+        return res.status(200)
+            .cookie("accessToken", accessToken, options)
+            .cookie("refreshToken", newRefreshToken, options)
+            .json(new apiResponse(200, { accessToken, refreshToken: newRefreshToken }, `Token refreshed successfully`))
+    } catch (error) {
+        throw new apiError(401, `Invalid refresh token`);
+    }
+})
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken }
