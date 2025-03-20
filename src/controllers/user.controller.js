@@ -4,6 +4,28 @@ import { apiResponse } from "../utils/apiResponse.js";
 import { User } from "../models/user.models.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
+// function for generating access and refresh token
+const generateAccessAndRefreshTokens = async (userId) => {
+    try {
+        const user = await User.findById(userId);
+        const accessToken = user.generateAccessToken();
+        const refreshToken = user.generateRefreshToken();
+        // check if the tokens are generated successfully
+        // console.log("Access token", accessToken);
+        // console.log("Refresh token", refreshToken);
+
+
+        user.refreshToken = refreshToken;
+        await user.save({ validateBeforeSave: false });
+        return { accessToken, refreshToken };
+
+    } catch (error) {
+        throw new apiError(500, `Error while genrating tokens!!`)
+    }
+
+}
+
+
 const registerUser = asyncHandler(async (req, res) => {
     // get the user details from frontend
     // Check wether the fields are empty
@@ -28,7 +50,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // 3rd - Step
     // .findOne() -> This method is commonly used in MongoDB to retrieve a single document/object from a collection that matches a given query. It returns only the first match
-    const existingUser = User.findOne({
+    const existingUser = await User.findOne({
         $or: [{ username }, { email }]
     })
     if (existingUser) throw new apiError(409, `User with the same username or email already exists!`)
@@ -36,7 +58,11 @@ const registerUser = asyncHandler(async (req, res) => {
     // 4th - Step
     // use multer to get request from the body
     const avatarLocalPath = req.files?.avatar[0]?.path;
-    const coverImageLocalPath = req.files?.coverImage[0]?.path;
+    // const coverImageLocalPath = req.files?.coverImage[0]?.path; // Gives undefined error as there is no array
+    let coverImageLocalPath;
+    if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+        coverImageLocalPath = req.files.coverImage[0].path;
+    }
     if (!avatarLocalPath) throw new apiError(400, `Avatar is required`);
 
     // 5th - Step
@@ -59,10 +85,81 @@ const registerUser = asyncHandler(async (req, res) => {
     // 7th & 8th - Step
     // The .select() method in Mongoose is used to specify which fields to include or exclude in the query result. It helps optimize performance by retrieving only the necessary data.
     // 🔹 The - (minus) sign before a field excludes it. You cannot mix inclusion and exclusion(except _id, which is an exception).
-    const createdUser = await User.findById(user._id).select("-password -refreshTokens")
+    const createdUser = await User.findById(user._id).select("-password -refreshToken")
     if (!createdUser) throw new apiError(500, `Something went wrong while registering the user!`)
 
     return res.status(201).json(new apiResponse(200, createdUser, `User Registered Sucessfully.`))
 })
 
-export { registerUser }
+const loginUser = asyncHandler(async (req, res) => {
+    // take email, password form req.body
+    // validate
+    // find the user from db
+    // give access token
+    // give refresh token
+    // send cookie
+    const { email, username, password } = req.body;
+
+    if (!(email || username)) throw new apiError(400, `Email or username is required`);
+
+    const user = await User.findOne({
+        $or: [{ username }, { email }]
+    })
+
+    if (!user) throw new apiError(404, `User not found`);
+
+    const isPassCorrect = await user.isPasswordCorrect(password);
+
+    if (!isPassCorrect) throw new apiError(401, `Invalid user credentials`);
+
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
+
+    // remove password and refreshtoken from the sent data/ can be done another way
+    const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+    // options for the cookies
+    const options = {
+        httpOnly: true, // The cookie cannot be accessed by JavaScript on the client-side, making it more secure.
+        secure: true, // The cookie is only sent over HTTPS, ensuring encrypted transmission.
+        sameSite: "lax", // "None" if frontend and backend are on different origins
+    }
+
+    return res.status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new apiResponse(200, {
+                user: loggedInUser,
+                accessToken,
+                refreshToken
+            },
+                "User logged in successfully")
+        )
+})
+
+const logoutUser = asyncHandler(async (req, res) => {
+    // find the user from database and update the refreshtoken
+    // remove the tokens from user
+    // send response
+    await User.findByIdAndUpdate(req.user._id, {
+        $unset: {
+            refreshToken: undefined
+        },
+    },
+        {
+            new: true,// this is necessary to get the updated document
+        })
+    // options for the cookies
+    const options = {
+        httpOnly: true, // The cookie cannot be accessed by JavaScript on the client-side, making it more secure.
+        secure: true, // The cookie is only sent over HTTPS, ensuring encrypted transmission.
+        sameSite: "lax", // "None" if frontend and backend are on different origins
+    }
+
+    return res.status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(new apiResponse(200, {}, "User Logged out successfully!"))
+
+})
+
+export { registerUser, loginUser, logoutUser }
