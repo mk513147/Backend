@@ -1,5 +1,10 @@
 # A project for Learning Backend
 
+## To-Do List
+- [ ] Replace the code examples with my examples in the basic structre.
+- [ ] Give the arcitectures link of their own.
+- [x] Set up the project structure
+
 ## Table of Contents
 
 1. [Target](#target)
@@ -183,6 +188,8 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 - This project uses a well-structured MVC (Model-View-Controller) architecture.
 - While making this project I also didn't know that there are other ways to write a backend.
 - I'll provide basic overview of the other models but if you want to know about other types of models. Explore the links below...
+  
+- **PS -> Ignore these sturctures for now if you are new to backend.**
 
 ### **1️⃣ Monolithic Architecture 🏠**
 Everything (frontend, backend, database) is part of a **single codebase**.
