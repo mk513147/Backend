@@ -28,6 +28,8 @@
 - The backend is the part of a software application that runs on a server and handles the logic, database interactions, authentication, and other core functions. It is responsible for processing requests from the frontend (what users see and interact with) and sending back the required data.
 - ![image](https://github.com/user-attachments/assets/4f285d7d-b562-433f-8a35-0ed88c1f9198)
 
+[⬆ Back to Top](#table-of-contents)
+
   
 ## Key Components of A Backend
 
@@ -52,14 +54,14 @@
   
 - **Business Logic** – Handles how the app processes data (e.g., calculating prices in an e-commerce site).
 
+[⬆ Back to Top](#table-of-contents)
+
 
 ## Basic Structure of a Backend Code 
 
 ![image](https://github.com/user-attachments/assets/b0671121-dcb9-4334-9b94-a8c52985de08)
 
 Your backend project is like a **restaurant**, where each folder plays a specific role. Let's break it down!  
-
----
 
 ### **1️⃣ `controllers/` → The Chef 👨‍🍳**  
 This folder contains functions that handle requests, just like a chef prepares food based on an order.  
@@ -76,8 +78,6 @@ exports.getPizza = (req, res) => {
 };
 ```
 
----
-
 ### **2️⃣ `db/` → The Restaurant’s Storage Room 🛄**  
 This folder manages the database, like a storage room where ingredients (data) are kept.  
 
@@ -90,8 +90,6 @@ This folder manages the database, like a storage room where ingredients (data) a
 const mongoose = require("mongoose");
 mongoose.connect(process.env.MONGO_URI);
 ```
-
----
 
 ### **3️⃣ `middlewares/` → The Security Guard 🚔**  
 Middleware acts like a restaurant’s security, checking customers before they enter.  
@@ -108,8 +106,6 @@ module.exports = (req, res, next) => {
 };
 ```
 
----
-
 ### **4️⃣ `models/` → The Menu 📜**  
 This folder defines how data is structured, just like a restaurant’s menu defines available dishes.  
 
@@ -123,8 +119,6 @@ const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema({ name: String, email: String });
 module.exports = mongoose.model("User", userSchema);
 ```
-
----
 
 ### **5️⃣ `routes/` → The Waiter 🧍‍🍽️**  
 Routes act like a waiter who takes orders and delivers them to the kitchen.  
@@ -143,8 +137,6 @@ router.get("/pizza", getPizza);
 module.exports = router;
 ```
 
----
-
 ### **6️⃣ `utils/` → Kitchen Gadgets 🍽️**  
 This folder contains helper functions, like kitchen tools (knives, ovens) that assist in cooking.  
 
@@ -158,8 +150,6 @@ const bcrypt = require("bcryptjs");
 module.exports = (password) => bcrypt.hashSync(password, 10);
 ```
 
----
-
 ### **7️⃣ `app.js` → The Restaurant’s Kitchen 🎩**  
 This file initializes the backend, just like a kitchen starts preparing meals when the restaurant opens.  
 
@@ -171,8 +161,6 @@ const app = express();
 app.use(express.json()); // Allows serving food (data) in a proper format
 module.exports = app;
 ```
-
----
 
 ### **8️⃣ `index.js` → The Restaurant’s Front Door 🚪**  
 This file starts the backend, just like unlocking the restaurant doors when it’s ready to serve customers.  
@@ -188,19 +176,7 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 ```
 
----
-
-### **📄 Conclusion**  
-- **Controllers** → The **chef** who prepares food.  
-- **Database (DB)** → The **storage room** where ingredients are kept.  
-- **Middlewares** → The **security guard** checking customers.  
-- **Models** → The **menu** that defines available items.  
-- **Routes** → The **waiter** taking and delivering orders.  
-- **Utils** → The **kitchen gadgets** that help cook food.  
-- **App.js** → The **kitchen** where everything is set up.  
-- **Index.js** → The **restaurant’s front door**, starting the service.
-
-
+[⬆ Back to Top](#table-of-contents)
 
 ## Different types of backend architecture
 
@@ -247,13 +223,16 @@ Represents data and business logic.
 - 
 **Example:** A restaurant's kitchen preparing food based on orders
 
+[⬆ Back to Top](#table-of-contents)
 
 ## Study Resources
 Here are some great links to study these architectures in detail:  
 - [Microservices vs Monolith - FreeCodeCamp](https://www.freecodecamp.org/news/monolith-vs-microservices/)  
 - [Serverless Architecture - AWS](https://aws.amazon.com/serverless/)  
 - [Event-Driven Systems - IBM](https://www.ibm.com/cloud/learn/event-driven-architecture)  
-- [Layered Architecture - Microsoft Docs](https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/layered)  
+- [Layered Architecture - Microsoft Docs](https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/layered)
+
+[⬆ Back to Top](#table-of-contents)
 
 
 
