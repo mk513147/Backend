@@ -290,6 +290,86 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
         .json(new apiResponse(200, user, "Cover Image updated successfully"));
 })
 
+const getUserChannelProfile = asyncHandler(async (req, res) => {
+    // get the username from params/URL
+    // validate the username
+    // find the user from the db using .find() method ----- OR ----- we can use aggregation piplines of mongoDB
+
+    const { username } = req.params;
+    if (!username?.trim()) throw new apiError(401, `Username is required`);
+
+    // this returns an array of objects
+    const channel = await User.aggregate(
+        [
+            {
+                // $match is used to filterr the documents
+                $match: {
+                    username: username.toLowerCase(),
+                },
+            },
+            {
+                // $lookup is used to join the collections/documents
+                // from -> document name
+                // LocalField -> field in the current document
+                // foreignField -> field in the document to join
+                // as -> alias name
+                // This also returns an array of objects
+                $lookup: {
+                    from: "subscriptions",
+                    localField: "_id",
+                    foreignField: "channel",
+                    as: "subscribers",
+                }
+            },
+            {
+                // this is for subscribing to the channel
+                $lookup: {
+                    from: "subscriptions",
+                    localField: "_id",
+                    foreignField: "subscriber",
+                    as: "subscribedTo",
+                }
+            },
+            {
+                // $addFields is used for adding the fields to the document
+                $addFields: {
+                    subscriberCount: { $size: "$subscribers" },// for counting the subscribers
+                    subscriberToCount: { $size: "$subscribedTo" },// for counting the no of channels subscribed by the user
+                    isSubscribed: {
+                        // $cond is used for conditional statements
+                        $cond: {
+                            // $in is used to check if the value is in the array/object
+                            // $in: [value, array/object]
+                            if: { $in: [req.user._id, "$subscribers.subscriber"] },
+                            then: true,
+                            else: false,
+                        }
+                    }
+                }
+            },
+            {
+                // $project is used to select the fields to return
+                // 1 -> to include the field
+                // 0 -> to exclude the field
+                $project: {
+                    fullName: 1,
+                    email: 1,
+                    avatar: 1,
+                    coverImage: 1,
+                    subscriberCount: 1,
+                    subscriberToCount: 1,
+                    isSubscribed: 1,
+                }
+            }
+        ]
+    )
+
+    if (!channel.length) throw new apiError(404, `Channel not found`);
+
+    return res.status(200)
+        .json(new apiResponse(200, channel[0], `Channel fetched successfully`));
+})
+
 export {
     registerUser,
     loginUser,
@@ -299,5 +379,6 @@ export {
     changeCurrentPassword,
     updateAccountDetails,
     updateUserCoverImage,
-    updateUserAvatar
+    updateUserAvatar,
+    getUserChannelProfile
 }
