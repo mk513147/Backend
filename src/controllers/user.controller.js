@@ -4,6 +4,7 @@ import { apiResponse } from "../utils/apiResponse.js";
 import { User } from "../models/user.models.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 // function for generating access and refresh token
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -249,6 +250,8 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     const avatarLocalPath = req.file?.path;// we can access this as we have used multer
     if (!avatarLocalPath) throw new apiError(401, `Avatar is required`);
 
+    // TODO: Delete the local path and previous image saved on cloudinary
+
     const avatar = await uploadOnCloudinary(avatarLocalPath);
 
     if (!avatar.url) throw new apiError(500, `Error while uploading the avatar`);
@@ -290,10 +293,49 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
         .json(new apiResponse(200, user, "Cover Image updated successfully"));
 })
 
+// This code is written using regular javascript methods
+// const getUserChannelProfile = asyncHandler(async (req, res) => {
+//     const { username } = req.params;
+//     if (!username?.trim()) throw new apiError(401, `Username is required`);
+
+//     // Find the user by username
+//     const user = await User.findOne({ username: username.toLowerCase() })
+//         .select("fullName email avatar coverImage _id");
+
+//     if (!user) throw new apiError(404, `Channel not found`);
+
+//     // Get subscriber count (Users who have subscribed to this channel)
+//     const subscribers = await Subscription.find({ channel: user._id }).select("subscriber");
+//     const subscriberCount = subscribers.length;
+
+//     // Get subscribed-to count (Channels the user has subscribed to)
+//     const subscribedTo = await Subscription.find({ subscriber: user._id }).select("channel");
+//     const subscriberToCount = subscribedTo.length;
+
+//     // Check if the requesting user is subscribed
+//     const isSubscribed = subscribers.some(sub => sub.subscriber.toString() === req.user._id.toString());
+
+//     return res.status(200).json(new apiResponse(200, {
+//         fullName: user.fullName,
+//         email: user.email,
+//         avatar: user.avatar,
+//         coverImage: user.coverImage,
+//         subscriberCount,
+//         subscriberToCount,
+//         isSubscribed
+//     }, `Channel fetched successfully`));
+// });
+
+
+// This code is written using aggregation
+// This is better than the above code as it is 
+// ✔ It reduces database calls,
+// ✔ Executes entirely within MongoDB,
+// ✔ Improves performance,
+// ✔ Scales better as data grows. 
 const getUserChannelProfile = asyncHandler(async (req, res) => {
     // get the username from params/URL
     // validate the username
-    // find the user from the db using .find() method ----- OR ----- we can use aggregation piplines of mongoDB
 
     const { username } = req.params;
     if (!username?.trim()) throw new apiError(401, `Username is required`);
@@ -308,8 +350,8 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                 },
             },
             {
-                // $lookup is used to join the collections/documents
-                // from -> document name
+                // $lookup is used to join the collections/documents/models
+                // from -> name of document/model from which we want to join ****** name should be in lowercase and plural/the same way it is saved in the db
                 // LocalField -> field in the current document
                 // foreignField -> field in the document to join
                 // as -> alias name
@@ -370,6 +412,58 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         .json(new apiResponse(200, channel[0], `Channel fetched successfully`));
 })
 
+// Conclusion: Which One Should You Use ?
+
+// ✅ Use Aggregation when dealing with large datasets and complex queries involving multiple joins, filtering, and calculations.
+
+// ✅ Use Regular Queries for simple data retrieval when the dataset is small, or if you need custom processing in JavaScript.
+
+const getWatchHistory = asyncHandler(async (req, res) => {
+    const user = await User.aggregate([
+        {
+            $match: {
+                _id: mongoose.Types.ObjectId(req.user._id),// converting the string to object id  and checking with the help of mongoose inbuilt method
+            }
+        },
+        {
+            $lookup: {
+                from: "videos",
+                localField: "watchHistory",
+                foreignField: "_id",
+                as: "watchHistory",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "owner",
+                            foreignField: "_id",
+                            as: "owner",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        fullName: 1,
+                                        username: 1,
+                                        avatar: 1,
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        // This is optional for making it easy for frontend
+                        $addFields: {
+                            owner: { $arrayElemAt: ["$owner", 0] },// { $first: "$owner"} can also be used
+                        }
+                    }
+                ]
+            }
+        }
+    ])
+
+    return res.status(200)
+        .json(new apiResponse(200, user[0].watchHistory, `Watch history fetched successfully`));
+})
+
 export {
     registerUser,
     loginUser,
@@ -380,5 +474,6 @@ export {
     updateAccountDetails,
     updateUserCoverImage,
     updateUserAvatar,
-    getUserChannelProfile
+    getUserChannelProfile,
+    getWatchHistory
 }
