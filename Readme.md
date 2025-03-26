@@ -234,10 +234,12 @@ Represents data and business logic.
 
 ## Study Resources
 Here are some great links to study these architectures in detail:  
-- [Microservices vs Monolith - FreeCodeCamp](https://www.freecodecamp.org/news/monolith-vs-microservices/)  
-- [Serverless Architecture - AWS](https://aws.amazon.com/serverless/)  
+- [Microservices - GeekForGeeks](https://www.geeksforgeeks.org/microservices/)
+- [Serverless Architecture - GeekForGeeks](https://www.geeksforgeeks.org/serverless-architectures/)  
 - [Event-Driven Systems - IBM](https://www.ibm.com/cloud/learn/event-driven-architecture)  
-- [Layered Architecture - Microsoft Docs](https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/layered)
+- [Layered Architecture - Waterloo pdf](https://cs.uwaterloo.ca/~m2nagapp/courses/CS446/1195/Arch_Design_Activity/Layered.pdf)
+- [Monolithic Architecture - GeekForGeeks](https://www.geeksforgeeks.org/monolithic-architecture-system-design/)
+- [Model-View-Controller - Tutorial Point](https://www.tutorialspoint.com/mvc_framework/mvc_framework_introduction.htm)
 
 [⬆ Back to Top](#table-of-contents)
 
