@@ -1,5 +1,3 @@
-# A project for Learning Backend
-
 ## Table of Contents
 
 1. [Target](#target)
@@ -8,7 +6,7 @@
 4. [Key Components of a Backend](#key-components-of-a-backend)
 5. [Basic Structure of a Backend Code](#basic-structure-of-a-backend-code)
 
-### NOTE: Each directory in this rep has it's own readme where i have explained the use of each file and the methods inside it..
+### NOTE: Each directory in this repo has it's own readme where I have explained the use of each file and the methods inside it..
 
 ## Target
 
@@ -61,9 +59,15 @@
 
 [⬆ Back to Top](#table-of-contents)
 
+
 ## Basic Structure of a Backend Code
 
 ![image](https://github.com/user-attachments/assets/b0671121-dcb9-4334-9b94-a8c52985de08)
+
+### Basic Flow 
+
+![image](https://github.com/user-attachments/assets/6507d382-406c-4821-a65f-625cd6e280e7)
+
 
 Your backend project is like a **restaurant**, where each folder plays a specific role. Let's break it down!
 
