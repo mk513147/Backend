@@ -1,11 +1,5 @@
 # A project for Learning Backend
 
-## To-Do List
-
-- [ ] Replace the code examples with my examples in the basic structre.
-- [ ] Give the arcitectures link of their own.
-- [x] Set up the project structure
-
 ## Table of Contents
 
 1. [Target](#target)
@@ -13,7 +7,8 @@
 3. [What is Backend](#what-is-backend)
 4. [Key Components of a Backend](#key-components-of-a-backend)
 5. [Basic Structure of a Backend Code](#basic-structure-of-a-backend-code)
-6. [Study Resources](#study-resources)
+
+### NOTE: Each directory in this rep has it's own readme where i have explained the use of each file and the methods inside it..
 
 ## Target
 
@@ -55,6 +50,7 @@
     .then(data => console.log(data));
 
     ```
+
   - #### Here
     - `https://api.openweathermap.org` → The base URL (server address).
     - `/data/2.5/weather` → The specific API endpoint for weather data.
@@ -214,9 +210,3 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 - This project uses a well-structured MVC (Model-View-Controller) architecture.
 - There are other ways to write a backend service feel free to explore...
-
-## Study Resources
-
-Here are some great links to study these architectures in detail:
-
-[⬆ Back to Top](#table-of-contents)
