@@ -1,4 +1,4 @@
-# Understanding Model and Schema in Mongoose
+# Understanding Model and Schema in Mongoose through the Video model
 
 Mongoose is an Object Data Modeling (ODM) library for MongoDB, which helps manage and interact with MongoDB databases using JavaScript/TypeScript. In your code, two key concepts are used: **Schema** and **Model**. Let's break them down step by step.
 
