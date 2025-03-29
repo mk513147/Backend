@@ -66,7 +66,8 @@
 
 ### Basic Flow 
 
-![image](https://github.com/user-attachments/assets/6507d382-406c-4821-a65f-625cd6e280e7)
+![image](https://github.com/user-attachments/assets/af43a9d3-35a1-4aba-b126-2c6b92185b8c)
+
 
 
 Your backend project is like a **restaurant**, where each folder plays a specific role. Let's break it down!
