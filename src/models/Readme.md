@@ -1,6 +1,6 @@
 # Understanding Model and Schema in Mongoose through the Video model
 
-Mongoose is an Object Data Modeling (ODM) library for MongoDB, which helps manage and interact with MongoDB databases using JavaScript/TypeScript. In your code, two key concepts are used: **Schema** and **Model**. Let's break them down step by step.
+Mongoose is an Object Data Modeling (ODM) library for MongoDB, which helps manage and interact with MongoDB databases using JavaScript/TypeScript. In our code, two key concepts are used: **Schema** and **Model**. Let's break them down step by step.
 
 ---
 
@@ -147,3 +147,5 @@ console.log(paginatedVideos);
 | **Schema**                               | Defines the **structure** and **rules** for documents in a collection.         |
 | **Model**                                | Provides an interface to interact with the MongoDB database (CRUD operations). |
 | **Plugin (`mongooseAggregatePaginate`)** | Adds pagination support for complex queries.                                   |
+
+### NOTE: Rest off the models are written in the same way with a few minor changes..
