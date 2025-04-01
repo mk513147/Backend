@@ -209,6 +209,23 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 ```
 
+### **9️⃣ `.env` → Restaurant’s kitchen recipe book 📕**
+
+This way, the restaurant keeps its secret sauce safe, just like .env keeps sensitive information hidden from public view. 🍽️🔐
+
+💡 **Example:**
+
+- The restaurant menu (your app) shows the dishes available, but it doesn’t reveal the exact recipes.
+- The chefs (your code) use secret recipes from the kitchen recipe book (.env file) to prepare the food.
+- **Note** - Using the enviornment variables can be **different** in different enviornments, Please check the documentation of the tech you are using..
+
+🗘️ **Code Example (`.env`)**
+
+```js
+YOUR_SECRET_CODE = JAOPJ12114
+yourSecretcode = "ihdaohi"
+```
+
 [⬆ Back to Top](#table-of-contents)
 
 #### PS:
