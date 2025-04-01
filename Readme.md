@@ -8,7 +8,7 @@
 
 ### NOTE: Each directory in this repo has it's own readme where I have explained the use of each file and the methods inside it..
 
-## Target
+## Motive
 
 - I should be able to review and understand the concepts I learned while making of this project, whenever I/Anyone comes to this repo in future.
 - A way to keep track of my progress.
