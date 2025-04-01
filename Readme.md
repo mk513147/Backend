@@ -1,6 +1,6 @@
 ## Table of Contents
 
-1. [Target](#target)
+1. [Motive](#target)
 2. [Learning from](#learning-from)
 3. [What is Backend](#what-is-backend)
 4. [Key Components of a Backend](#key-components-of-a-backend)
@@ -211,7 +211,7 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 ### **9️⃣ `.env` → Restaurant’s kitchen recipe book 📕**
 
-This way, the restaurant keeps its secret sauce safe, just like .env keeps sensitive information hidden from public view. 🍽️🔐
+This file is used to keep secret infos, the restaurant keeps its secret sauce safe, just like .env keeps sensitive information hidden from public view. 🍽️🔐
 
 💡 **Example:**
 
