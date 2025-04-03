@@ -6,7 +6,7 @@
 4. [Key Components of a Backend](#key-components-of-a-backend)
 5. [Basic Structure of a Backend Code](#basic-structure-of-a-backend-code)
 
-### NOTE: Each directory in this repo has it's own readme where I have explained the use of each file and the methods inside it..
+### NOTE: Each directory in this repo has it's own explanation files where I have explained the use of each file and the methods inside it..
 
 ## Motive
 
