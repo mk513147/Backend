@@ -59,16 +59,13 @@
 
 [⬆ Back to Top](#table-of-contents)
 
-
 ## Basic Structure of a Backend Code
 
 ![image](https://github.com/user-attachments/assets/b0671121-dcb9-4334-9b94-a8c52985de08)
 
-### Basic Flow 
+### Basic Flow
 
 ![image](https://github.com/user-attachments/assets/af43a9d3-35a1-4aba-b126-2c6b92185b8c)
-
-
 
 Your backend project is like a **restaurant**, where each folder plays a specific role. Let's break it down!
 
@@ -222,8 +219,8 @@ This file is used to keep secret infos, the restaurant keeps its secret sauce sa
 🗘️ **Code Example (`.env`)**
 
 ```js
-YOUR_SECRET_CODE = JAOPJ12114
-yourSecretcode = "ihdaohi"
+YOUR_SECRET_CODE = JAOPJ12114;
+yourSecretcode = "ihdaohi";
 ```
 
 [⬆ Back to Top](#table-of-contents)

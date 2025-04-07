@@ -270,6 +270,9 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         .status(200)
         .json(new apiResponse(200, user, "Avatar Image updated successfully"));
 })
+
+
+
 const updateUserCoverImage = asyncHandler(async (req, res) => {
     const coverImageLocalPath = req.file?.path;
     if (!coverImageLocalPath) throw new apiError(401, `Avatar is required`);

@@ -1,4 +1,16 @@
-# Step-by-Step Explanation of User Authentication Code
+# Step-by-Step Explanation of User Controller/Authentication Code
+
+## Functions used
+
+1. [Token Generator Function](#2-token-generation-function)
+2. [Register User Function](#4-register-user-function)
+3. [Login User Function](#5-login-user-function)
+4. [Logout User Function](#6-logout-user-function)
+5. [Refresh Access Token Function](#7-refresh-access-token)
+6. [Change User password Function](#8-changing-user-password)
+7. [Getting the current user Function](#9-fetching-the-current-user)
+8. [Updating the avatar image Function](#10-updating-the-user-avatar-image)
+9. [Updating the cover image Function](#note-the-cover-image-is-also-updated-with-the-same-method)
 
 ## 1. Importing Dependencies
 
@@ -47,6 +59,8 @@ const generateAccessAndRefreshTokens = async (userId) => {
 4. Save the user document to the database. `{ validateBeforeSave: false }` This prevents any default validation before saving.
 5. Return both tokens.
 6. If an error occurs, throw an API error.
+
+[⬆ Back to top](#functions-used)
 
 ---
 
@@ -159,6 +173,8 @@ const registerUser = asyncHandler(async (req, res) => {
    - The `.select()` method excludes or includes the fields in the string. '-' means exclude.
 10. Send a success response with the created user data.
 
+[⬆ Back to top](#functions-used)
+
 ---
 
 ## 5. Login User Function
@@ -214,6 +230,8 @@ const loginUser = asyncHandler(async (req, res) => {
 6. Remove sensitive data before responding through `.select()` method.
 7. Send response with cookies and user data.
 
+[⬆ Back to top](#functions-used)
+
 ---
 
 ## 6. Logout User Function
@@ -246,6 +264,8 @@ const logoutUser = asyncHandler(async (req, res) => {
 2. Find the user through `req.user.id` and remove the refresh token from the database.
 3. Clear `accessToken` and `refreshToken` cookies.
 4. Send a logout success response.
+
+[⬆ Back to top](#functions-used)
 
 ---
 
@@ -301,9 +321,11 @@ try {
 6. Generate a new access and refresh token.
 7. Store tokens in cookies and send the response.
 
+[⬆ Back to top](#functions-used)
+
 ---
 
-## 8. Changing User Password (changeCurrentPassword)
+## 8. Changing User Password
 
 This function allows a logged-in user to change their password.
 
@@ -337,9 +359,11 @@ return res
 5. Update the password and save the changes.
 6. Send a success response.
 
+[⬆ Back to top](#functions-used)
+
 ---
 
-## 7. Fetching the Current User (getCurrentUser)
+## 9. Fetching the Current User
 
 This function retrieves the logged-in user's details.
 
@@ -355,3 +379,52 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 
 1. Respond with the current user details stored in req.user.
 2. Send a success response.
+
+[⬆ Back to top](#functions-used)
+
+---
+
+## 10. Updating the user avatar image
+
+This function updates the avatar image which we have stored in the web service(in this case it is **Cloudinary**).
+
+```javascript
+const updateUserAvatar = asyncHandler(async (req, res) => {
+  const avatarLocalPath = req.file?.path;
+  if (!avatarLocalPath) throw new apiError(401, `Avatar is required`);
+
+  const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+  if (!avatar.url) throw new apiError(500, `Error while uploading the avatar`);
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        avatar: avatar.url,
+      },
+    },
+    {
+      new: true,
+    }
+  ).select("-password");
+  return res
+    .status(200)
+    .json(new apiResponse(200, user, "Avatar Image updated successfully"));
+});
+```
+
+### Steps:
+
+1. Get the file path by using **Multer** middleware in the `req.file?.path`.
+2. Validate the path.
+3. Upload the file on cloudinary throught the method defined in the **Utils** folder.
+4. Validate the url response we get after uploading the file i.e. Checking it is uploaded properly or not.
+5. Find the user from the database and update its avatar path.
+6. Return response on success
+
+### NOTE: The cover image is also updated with the same method
+
+[⬆ Back to top](#functions-used)
+
+---
