@@ -11,7 +11,11 @@
 7. [Getting the current user Function](#9-fetching-the-current-user)
 8. [Updating the avatar image Function](#10-updating-the-user-avatar-image)
 9. [Updating the cover image Function](#note-the-cover-image-is-also-updated-with-the-same-method)
-10. [Get User Channel Profile](#11-get-user-channel-profile) -[Using regular JS](#regular-query-based-implementation) -[Using Aggregation Queries](#aggregation-based-implementation)
+10. [Get User Channel Profile](#11-get-user-channel-profile)
+
+    -[Using regular JS](#regular-query-based-implementation)
+
+    -[Using Aggregation Queries](#aggregation-based-implementation)
 
 ## 1. Importing Dependencies
 
@@ -499,6 +503,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 1. Get the username from the url(req.params)
 2. Validate the username.
 3. Find the the user from the DB via the username.
+
 4. Get the subscribers and no of channels (subscribedTo) `Subscription.find({ channel: user._id }).select("subscriber");` from the Subscription model/document.
 5. Get the subscriber and channel count using the length property of array as the `.find()` returns an array of objects.
 6. Check if the user is subscribed to the using the `.some()` method and comparing the subscribers id to the users id.
@@ -583,9 +588,9 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 4. `$lookup (Subscribed To)` - Joins subscriptions where the user is the subscriber.
 5. `$addFields` - Adds computed values:
 
-- `subscriberCount`: total number of subscribers
-- `subscriberToCount`: total number of subscriptions
-- `isSubscribed`: checks if `req.user._id` exists in the `subscribers.subscriber` list
+   - `subscriberCount`: total number of subscribers
+   - `subscriberToCount`: total number of subscriptions
+   - `isSubscribed`: checks if `req.user._id` exists in the `subscribers.subscriber` list
 
 6. `$project`: Selects the fields to return in the response.
 
