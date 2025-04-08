@@ -11,6 +11,7 @@
 7. [Getting the current user Function](#9-fetching-the-current-user)
 8. [Updating the avatar image Function](#10-updating-the-user-avatar-image)
 9. [Updating the cover image Function](#note-the-cover-image-is-also-updated-with-the-same-method)
+10. [Get User Channel Profile](#11-get-user-channel-profile) -[Using regular JS](#regular-query-based-implementation) -[Using Aggregation Queries](#aggregation-based-implementation)
 
 ## 1. Importing Dependencies
 
@@ -428,3 +429,166 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 [⬆ Back to top](#functions-used)
 
 ---
+
+## 11. Get User Channel Profile
+
+This function retrieves a user's channel profile based on their username. It returns:
+
+- Basic user information (`fullName`, `email`, `avatar`, `coverImage`)
+- The **number of subscribers** the user has
+- The **number of channels** the user is subscribed to
+- A boolean flag indicating whether the **requesting user** has subscribed to this channel
+- **This function can be written in two ways:**
+  - Regular query based implementation
+  - Aggregation-Based Implementation
+
+---
+
+### Regular Query-Based Implementation
+
+❌ Use Regular Queries:
+
+- When the logic is very simple
+- When the dataset is small
+- If you need custom logic that's hard to express in aggregation
+
+```javascript
+const getUserChannelProfile = asyncHandler(async (req, res) => {
+  const { username } = req.params;
+  if (!username?.trim()) throw new apiError(401, `Username is required`);
+
+  const user = await User.findOne({ username: username.toLowerCase() }).select(
+    "fullName email avatar coverImage _id"
+  );
+
+  if (!user) throw new apiError(404, `Channel not found`);
+
+  const subscribers = await Subscription.find({ channel: user._id }).select(
+    "subscriber"
+  );
+  const subscribedTo = await Subscription.find({ subscriber: user._id }).select(
+    "channel"
+  );
+
+  const subscriberCount = subscribers.length;
+  const subscriberToCount = subscribedTo.length;
+  const isSubscribed = subscribers.some(
+    (sub) => sub.subscriber.toString() === req.user._id.toString()
+  );
+
+  return res.status(200).json(
+    new apiResponse(
+      200,
+      {
+        fullName: user.fullName,
+        email: user.email,
+        avatar: user.avatar,
+        coverImage: user.coverImage,
+        subscriberCount,
+        subscriberToCount,
+        isSubscribed,
+      },
+      `Channel fetched successfully`
+    )
+  );
+});
+```
+
+### Steps:
+
+1. Get the username from the url(req.params)
+2. Validate the username.
+3. Find the the user from the DB via the username.
+4. Get the subscribers and no of channels (subscribedTo) `Subscription.find({ channel: user._id }).select("subscriber");` from the Subscription model/document.
+5. Get the subscriber and channel count using the length property of array as the `.find()` returns an array of objects.
+6. Check if the user is subscribed to the using the `.some()` method and comparing the subscribers id to the users id.
+7. Return the repsonse along with the required fields.
+
+[⬆ Back to top](#functions-used)
+
+### Aggregation-Based Implementation
+
+✅ Use Aggregation:
+
+- When performance is critical
+- When you're doing joins, filtering, and counting
+- When working with large datasets
+
+```javascript
+const getUserChannelProfile = asyncHandler(async (req, res) => {
+  const { username } = req.params;
+  if (!username?.trim()) throw new apiError(401, `Username is required`);
+
+  const channel = await User.aggregate([
+    {
+      $match: {
+        username: username.toLowerCase(),
+      },
+    },
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "channel",
+        as: "subscribers",
+      },
+    },
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "subscriber",
+        as: "subscribedTo",
+      },
+    },
+    {
+      $addFields: {
+        subscriberCount: { $size: "$subscribers" },
+        subscriberToCount: { $size: "$subscribedTo" },
+        isSubscribed: {
+          $cond: {
+            if: { $in: [req.user._id, "$subscribers.subscriber"] },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        fullName: 1,
+        email: 1,
+        avatar: 1,
+        coverImage: 1,
+        subscriberCount: 1,
+        subscriberToCount: 1,
+        isSubscribed: 1,
+      },
+    },
+  ]);
+
+  if (!channel.length) throw new apiError(404, `Channel not found`);
+
+  return res
+    .status(200)
+    .json(new apiResponse(200, channel[0], `Channel fetched successfully`));
+});
+```
+
+### Steps:
+
+1. Get the username from the url(req.params)
+2. `$match` - Filters the user by username.
+3. `$lookup (Subscribers)` - Joins subscriptions where the user is the channel.
+4. `$lookup (Subscribed To)` - Joins subscriptions where the user is the subscriber.
+5. `$addFields` - Adds computed values:
+
+- `subscriberCount`: total number of subscribers
+- `subscriberToCount`: total number of subscriptions
+- `isSubscribed`: checks if `req.user._id` exists in the `subscribers.subscriber` list
+
+6. `$project`: Selects the fields to return in the response.
+
+---
+
+[⬆ Back to top](#functions-used)
