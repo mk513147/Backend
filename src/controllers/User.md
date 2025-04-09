@@ -12,11 +12,12 @@
 8. [Updating the avatar image Function](#10-updating-the-user-avatar-image)
 9. [Updating the cover image Function](#note-the-cover-image-is-also-updated-with-the-same-method)
 10. [Get User Channel Profile](#11-get-user-channel-profile)
-11. [Get User Watch History](#12-get-watch-history)
 
     -[Using regular JS](#regular-query-based-implementation)
 
     -[Using Aggregation Queries](#aggregation-based-implementation)
+
+11. [Get User Watch History](#12-get-watch-history)
 
 ## 1. Importing Dependencies
 
