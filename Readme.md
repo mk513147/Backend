@@ -67,6 +67,8 @@
 
 ![image](https://github.com/user-attachments/assets/af43a9d3-35a1-4aba-b126-2c6b92185b8c)
 
+#### NOTE: Always discuss the models first beore writing the code then you can write it later as the flow suggests.
+
 Your backend project is like a **restaurant**, where each folder plays a specific role. Let's break it down!
 
 ### **1️⃣ `controllers/` → The Chef 👨‍🍳**
