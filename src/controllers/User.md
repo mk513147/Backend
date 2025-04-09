@@ -12,6 +12,7 @@
 8. [Updating the avatar image Function](#10-updating-the-user-avatar-image)
 9. [Updating the cover image Function](#note-the-cover-image-is-also-updated-with-the-same-method)
 10. [Get User Channel Profile](#11-get-user-channel-profile)
+11. [Get User Watch History](#12-get-watch-history)
 
     -[Using regular JS](#regular-query-based-implementation)
 
@@ -594,6 +595,107 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 
 6. `$project`: Selects the fields to return in the response.
 
+[⬆ Back to top](#functions-used)
+
 ---
+
+## 12. Get Watch History
+
+This function retrieves the **watch history** of the currently logged-in user, fully populated with video and owner (uploader) details.
+
+```javascript
+const getWatchHistory = asyncHandler(async (req, res) => {
+    const user = await User.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(req.user._id),
+            }
+        },
+        {
+            $lookup: {
+                from: "videos",
+                localField: "watchHistory",
+                foreignField: "_id",
+                as: "watchHistory",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "owner",
+                            foreignField: "_id",
+                            as: "owner",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        fullName: 1,
+                                        username: 1,
+                                        avatar: 1,
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $addFields: {
+                            owner: { $arrayElemAt: ["$owner", 0] },
+                        }
+                    }
+                ]
+            }
+        }
+    ])
+
+```
+
+### Steps:
+
+1. `$match` — Filter by User ID
+
+   - Filters documents to return **only the logged-in user**.
+   - `mongoose.Types.ObjectId(...)`: Ensures the ID is in the correct format.
+
+2. `$lookup` — Populate `watchHistory` from `videos` Collection
+
+   - Joins the `videos` collection.
+   - Replaces video IDs in `watchHistory` with **full video documents**.
+   - Uses a **pipeline** to further process each video.
+
+3. `$lookup` — Populate `owner` of Each Video from `users` Collection
+
+   - Populates the `owner` field (user who uploaded the video).
+   - Selects only needed fields using `$project`.
+
+4. `$addFields` — Flatten the `owner` Field
+
+   - Extracts the first (and only) user from the `owner` array.
+   - Alternative: `{ $first: "$owner" }`.
+
+5. Returns a single user document with:
+   - `watchHistory`: An array of fully populated video objects.
+   - Each video contains:
+     - Its own data.
+     - An `owner` field with uploader's `fullName`, `username`, and `avatar`.
+
+[⬆ Back to top](#functions-used)
+
+---
+
+## 13. Export all the functions
+
+```javascript
+export {
+  registerUser,
+  loginUser,
+  logoutUser,
+  refreshAccessToken,
+  getCurrentUser,
+  changeCurrentPassword,
+  updateAccountDetails,
+  updateUserCoverImage,
+  updateUserAvatar,
+  getUserChannelProfile,
+  getWatchHistory,
+};
+```
 
 [⬆ Back to top](#functions-used)
